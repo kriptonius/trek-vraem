@@ -4,6 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trek VRAEM — Circuito 5 Cataratas / Rey del VRAEM</title>
+<script>
+  window.__debugErrors = [];
+  window.addEventListener('error', function(e){
+    var msg = '⚠️ ERROR: ' + e.message + '\n   archivo: ' + e.filename + '\n   línea: ' + e.lineno + ':' + e.colno + '\n\n';
+    window.__debugErrors.push(msg);
+    renderDebugBox();
+  });
+  function renderDebugBox(){
+    if(!document.body) return;
+    var box = document.getElementById('debugErrorBox');
+    if(!box){
+      box = document.createElement('div');
+      box.id = 'debugErrorBox';
+      box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#3a0d0d;color:#ffb0a5;font-family:monospace;font-size:12px;padding:14px;white-space:pre-wrap;max-height:50vh;overflow:auto;';
+      document.body.appendChild(box);
+    }
+    box.textContent = window.__debugErrors.join('');
+  }
+  document.addEventListener('DOMContentLoaded', renderDebugBox);
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -954,7 +974,7 @@ function updateCupoUI(count){
     : 'Cupos completos por ahora, escríbenos igual para la próxima fecha';
 }
 
-const ORG_WHATSAPP = '51963845681'; // +51 963 845 681
+const ORG_WHATSAPP = '51987654321'; // TODO: reemplaza por tu número real con código de país, sin +
 
 const aceptoBox = document.getElementById('aceptoDeslinde');
 const submitBtn = document.getElementById('submitBtn');
