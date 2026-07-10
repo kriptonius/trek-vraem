@@ -714,7 +714,7 @@ const EVENTO_ID = 'pichari-5cataratas-2026-07';
 const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
 const SUPABASE_ANON_KEY = 'TU-ANON-KEY-AQUI';
 
-const supabase = (SUPABASE_URL.includes('TU-PROYECTO'))
+const supabaseClient = (SUPABASE_URL.includes('TU-PROYECTO'))
   ? null
   : window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -951,12 +951,12 @@ radioAudio.addEventListener('error', () => {
 });
 
 async function loadCupos(){
-  if(!supabase){
+  if(!supabaseClient){
     document.getElementById('cuposText').textContent = 'Conecta Supabase para ver cupos reales (revisa SUPABASE_URL/ANON_KEY en el código).';
     return 0;
   }
   try{
-    const { data, error } = await supabase.rpc('contar_inscritos', { p_evento: EVENTO_ID });
+    const { data, error } = await supabaseClient.rpc('contar_inscritos', { p_evento: EVENTO_ID });
     if(error) throw error;
     updateCupoUI(data || 0);
     return data || 0;
@@ -986,7 +986,7 @@ document.getElementById('regForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
   if(!aceptoBox.checked) return;
 
-  if(!supabase){
+  if(!supabaseClient){
     alert('Falta conectar Supabase (SUPABASE_URL / SUPABASE_ANON_KEY) para que el registro se guarde de verdad.');
     return;
   }
@@ -1001,7 +1001,7 @@ document.getElementById('regForm').addEventListener('submit', async (e)=>{
   const acceptedAt = new Date().toISOString();
 
   try{
-    const { error } = await supabase.from('inscripciones_trek').insert([{
+    const { error } = await supabaseClient.from('inscripciones_trek').insert([{
       evento: EVENTO_ID,
       nombre,
       whatsapp,
