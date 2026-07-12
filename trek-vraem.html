@@ -405,9 +405,24 @@
   }
 
   /* CHAT MATEO */
-  .mateo-bubble{
+  .mateo-launcher{
     position:fixed;bottom:22px;right:20px;z-index:100;
-    width:56px;height:56px;border-radius:50%;
+    display:flex;align-items:center;gap:10px;
+  }
+  .mateo-launcher-label{
+    background:var(--forest-deep);
+    border:1px solid rgba(240,244,239,0.16);
+    color:var(--mist);font-family:'IBM Plex Mono',monospace;
+    font-size:0.72rem;font-weight:500;letter-spacing:0.01em;
+    padding:9px 14px;border-radius:100px;white-space:nowrap;
+    box-shadow:0 10px 24px -10px rgba(0,0,0,0.5);
+    transition:opacity 0.2s ease, transform 0.2s ease;
+  }
+  .mateo-launcher-label.is-hidden{
+    opacity:0;transform:translateX(8px);pointer-events:none;
+  }
+  .mateo-bubble{
+    width:56px;height:56px;border-radius:50%;flex:0 0 auto;
     background:var(--coral);color:var(--forest-deep);
     display:flex;align-items:center;justify-content:center;
     font-size:1.5rem;border:none;cursor:pointer;
@@ -441,15 +456,9 @@
   .mateo-msg.bot{background:rgba(240,244,239,0.06);align-self:flex-start;border-bottom-left-radius:4px;}
   .mateo-msg.user{background:var(--coral);color:var(--forest-deep);align-self:flex-end;border-bottom-right-radius:4px;}
   .mateo-msg.typing{color:var(--text-dim);font-style:italic;}
-  .mateo-wa-bar{
-    padding:9px 16px;border-top:1px solid rgba(240,244,239,0.1);
-    background:rgba(240,244,239,0.02);
+  .mateo-msg a.mateo-phone-link{
+    color:var(--coral);font-weight:600;text-decoration:underline;
   }
-  .mateo-wa-link{
-    display:flex;align-items:center;gap:6px;
-    font-size:0.78rem;color:var(--coral);text-decoration:none;font-weight:600;
-  }
-  .mateo-wa-link:hover{text-decoration:underline;}
   .mateo-input-row{
     display:flex;gap:8px;padding:12px;border-top:1px solid rgba(240,244,239,0.1);
   }
@@ -1048,13 +1057,32 @@ let mateoOpen = false;
 function toggleMateo(){
   mateoOpen = !mateoOpen;
   document.getElementById('mateoPanel').classList.toggle('is-open', mateoOpen);
+  document.getElementById('mateoLauncherLabel').classList.toggle('is-hidden', mateoOpen);
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// Convierte números peruanos de 9 dígitos (ej. 963845681) mencionados por Mateo
+// en links clickeables de WhatsApp, sin tocar el resto del texto.
+function linkifyPhones(escapedText){
+  return escapedText.replace(/\b9\d{8}\b/g, (num) => {
+    return `<a href="https://wa.me/51${num}" target="_blank" rel="noopener" class="mateo-phone-link">${num}</a>`;
+  });
 }
 
 function appendMateoMsg(text, role){
   const wrap = document.getElementById('mateoMessages');
   const div = document.createElement('div');
   div.className = `mateo-msg ${role}`;
-  div.textContent = text;
+  if(role === 'bot'){
+    div.innerHTML = linkifyPhones(escapeHtml(text));
+  }else{
+    div.textContent = text;
+  }
   wrap.appendChild(div);
   wrap.scrollTop = wrap.scrollHeight;
   return div;
@@ -1095,7 +1123,10 @@ async function sendMateo(){
 }
 </script>
 
-<button type="button" class="mateo-bubble" id="mateoBubble" onclick="toggleMateo()" aria-label="Habla con Mateo">💬</button>
+<div class="mateo-launcher">
+  <span class="mateo-launcher-label" id="mateoLauncherLabel">Mateo · Asistente IA</span>
+  <button type="button" class="mateo-bubble" id="mateoBubble" onclick="toggleMateo()" aria-label="Habla con Mateo">💬</button>
+</div>
 
 <div class="mateo-panel" id="mateoPanel">
   <div class="mateo-head">
@@ -1110,9 +1141,6 @@ async function sendMateo(){
   </div>
   <div class="mateo-messages" id="mateoMessages">
     <div class="mateo-msg bot">Hola 👋 soy Mateo. Pregúntame lo que quieras sobre el trek: ruta, inscripción, pago, o consejos para el día de la caminata.</div>
-  </div>
-  <div class="mateo-wa-bar">
-    <a href="https://wa.me/51963845681" target="_blank" rel="noopener" class="mateo-wa-link">💬 ¿Prefieres WhatsApp? Escríbenos directo →</a>
   </div>
   <div class="mateo-input-row">
     <input type="text" id="mateoInput" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter') sendMateo();">
