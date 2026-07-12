@@ -429,8 +429,10 @@
     display:flex;align-items:center;justify-content:space-between;
   }
   .mateo-head-title{display:flex;align-items:center;gap:8px;}
-  .mateo-head-dot{width:8px;height:8px;border-radius:50%;background:#5DDD8F;box-shadow:0 0 0 3px rgba(93,221,143,0.15);}
+  .mateo-head-dot{width:8px;height:8px;border-radius:50%;background:#5DDD8F;box-shadow:0 0 0 3px rgba(93,221,143,0.15);flex:0 0 auto;}
+  .mateo-head-names{display:flex;flex-direction:column;line-height:1.25;}
   .mateo-head strong{font-family:'Fraunces',serif;font-size:0.95rem;}
+  .mateo-head-sub{font-size:0.66rem;color:var(--text-dim);font-family:'IBM Plex Mono',monospace;letter-spacing:0.02em;}
   .mateo-close{background:transparent;border:none;color:var(--text-dim);font-size:1.1rem;cursor:pointer;}
   .mateo-messages{
     flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;
@@ -439,6 +441,15 @@
   .mateo-msg.bot{background:rgba(240,244,239,0.06);align-self:flex-start;border-bottom-left-radius:4px;}
   .mateo-msg.user{background:var(--coral);color:var(--forest-deep);align-self:flex-end;border-bottom-right-radius:4px;}
   .mateo-msg.typing{color:var(--text-dim);font-style:italic;}
+  .mateo-wa-bar{
+    padding:9px 16px;border-top:1px solid rgba(240,244,239,0.1);
+    background:rgba(240,244,239,0.02);
+  }
+  .mateo-wa-link{
+    display:flex;align-items:center;gap:6px;
+    font-size:0.78rem;color:var(--coral);text-decoration:none;font-weight:600;
+  }
+  .mateo-wa-link:hover{text-decoration:underline;}
   .mateo-input-row{
     display:flex;gap:8px;padding:12px;border-top:1px solid rgba(240,244,239,0.1);
   }
@@ -1090,12 +1101,18 @@ async function sendMateo(){
   <div class="mateo-head">
     <div class="mateo-head-title">
       <span class="mateo-head-dot"></span>
-      <strong>Mateo</strong>
+      <div class="mateo-head-names">
+        <strong>Mateo</strong>
+        <span class="mateo-head-sub">Asesor IA · Trek Pichari</span>
+      </div>
     </div>
     <button type="button" class="mateo-close" onclick="toggleMateo()">✕</button>
   </div>
   <div class="mateo-messages" id="mateoMessages">
     <div class="mateo-msg bot">Hola 👋 soy Mateo. Pregúntame lo que quieras sobre el trek: ruta, inscripción, pago, o consejos para el día de la caminata.</div>
+  </div>
+  <div class="mateo-wa-bar">
+    <a href="https://wa.me/51963845681" target="_blank" rel="noopener" class="mateo-wa-link">💬 ¿Prefieres WhatsApp? Escríbenos directo →</a>
   </div>
   <div class="mateo-input-row">
     <input type="text" id="mateoInput" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter') sendMateo();">
