@@ -13,6 +13,7 @@
   });
   function renderDebugBox(){
     if(!document.body) return;
+    if(window.__debugErrors.length === 0) return;
     var box = document.getElementById('debugErrorBox');
     if(!box){
       box = document.createElement('div');
