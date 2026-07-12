@@ -196,6 +196,81 @@
   .map-box-head .mono{color:var(--coral);font-size:0.85rem;}
   .map-note{font-size:0.78rem;color:var(--text-dim);margin-top:10px;}
 
+  /* MARKETPLACE (reemplaza el mapa al tocar la pestaña Negocios) */
+  .marketplace-grid{
+    display:none;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .marketplace-grid.is-active{display:grid;}
+  .mkt-card{
+    background:rgba(240,244,239,0.03);
+    border:1px solid rgba(240,244,239,0.12);
+    border-radius:12px;overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .mkt-card img{
+    width:100%;height:110px;object-fit:cover;display:block;
+  }
+  .mkt-card-body{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1;}
+  .mkt-card-title{font-family:'Fraunces',serif;font-size:0.95rem;font-weight:600;}
+  .mkt-card-sub{font-size:0.72rem;color:var(--text-dim);}
+  .mkt-card-cta{
+    margin-top:auto;display:inline-block;text-align:center;
+    background:var(--coral);color:var(--forest-deep);
+    font-size:0.78rem;font-weight:600;text-decoration:none;
+    padding:8px 10px;border-radius:8px;
+  }
+  .mkt-card.is-empty{
+    align-items:center;justify-content:center;text-align:center;
+    border:1px dashed rgba(240,244,239,0.25);background:transparent;
+    padding:20px 12px;gap:8px;min-height:170px;
+  }
+  .mkt-card.is-empty .mkt-empty-icon{font-size:1.5rem;color:var(--text-dim);}
+  .mkt-card.is-empty .mkt-card-sub{font-size:0.78rem;}
+  .mkt-card.is-empty .mkt-card-cta{
+    background:transparent;border:1px solid rgba(240,244,239,0.25);color:var(--mist);
+  }
+  @media (max-width:480px){
+    .marketplace-grid{grid-template-columns:1fr;}
+  }
+
+  /* NEGOCIOS CON ESSTRADA CO. */
+  section.negocios{padding:60px 0;border-top:1px solid rgba(240,244,239,0.08);}
+  section.negocios h2{font-size:1.8rem;margin-bottom:6px;}
+  section.negocios .lead{color:var(--text-dim);margin-bottom:28px;font-size:1rem;}
+  .negocios-box{
+    background:linear-gradient(155deg, rgba(45,110,110,0.15), rgba(255,107,74,0.06));
+    border:1px solid rgba(240,244,239,0.1);border-radius:16px;padding:28px;
+  }
+  .negocios-box .wa-btn{margin-top:0;}
+  .pago-methods{
+    display:flex;flex-direction:column;gap:10px;margin-top:20px;
+    padding-top:20px;border-top:1px solid rgba(240,244,239,0.1);
+  }
+  .pago-method{font-size:0.85rem;color:var(--text-dim);}
+  .pago-method strong{color:var(--mist);}
+  .pago-method .mono-value{
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--sand);
+    word-break:break-all;
+  }
+
+  /* ALERTA DENGUE */
+  section.dengue{padding:60px 0;border-top:1px solid rgba(240,244,239,0.08);}
+  .dengue-box{
+    background:rgba(255,107,74,0.08);
+    border:1px solid rgba(255,107,74,0.3);
+    border-radius:16px;padding:28px;
+    display:flex;gap:18px;align-items:flex-start;
+  }
+  .dengue-icon{font-size:2.2rem;flex:0 0 auto;line-height:1;}
+  .dengue-box h2{font-size:1.4rem;margin-bottom:8px;color:var(--mist);}
+  .dengue-box ul{margin:12px 0 0 18px;color:var(--text-dim);font-size:0.9rem;line-height:1.7;}
+  .dengue-box .dengue-note{font-size:0.78rem;color:var(--text-dim);margin-top:14px;}
+  @media (max-width:480px){
+    .dengue-box{flex-direction:column;}
+  }
+
   /* REGISTRO */
   section.registro{padding:60px 0 90px;border-top:1px solid rgba(240,244,239,0.08);}
   .reg-box{
@@ -498,18 +573,19 @@
 
     <div class="map-box hero-map" id="mapBox">
       <div class="map-box-head">
-        <h3>Distancia del punto de partida al destino</h3>
-        <span class="mono" id="distText">Calculando...</span>
+        <h3 id="mapBoxTitle">Anuncios de negocios en Pichari</h3>
+        <span class="mono" id="distText">Coordina por WhatsApp</span>
       </div>
 
       <div class="map-tabs">
-        <button type="button" class="map-tab active" data-layer="map" onclick="setMapLayer('map', this)">Mapa</button>
+        <button type="button" class="map-tab" data-layer="map" onclick="setMapLayer('map', this)">Mapa</button>
         <button type="button" class="map-tab" data-layer="sat" onclick="setMapLayer('sat', this)">Satélite</button>
         <button type="button" class="map-tab" data-layer="street" onclick="setMapLayer('street', this)">Street View</button>
-        <button type="button" class="map-fullscreen-btn" id="fullscreenBtn" onclick="toggleMapFullscreen()" aria-label="Pantalla completa">⛶</button>
+        <button type="button" class="map-tab active" id="negociosTab" onclick="showMarketplace(this)">Negocios</button>
+        <button type="button" class="map-fullscreen-btn" id="fullscreenBtn" onclick="toggleMapFullscreen()" aria-label="Pantalla completa" style="display:none;">⛶</button>
       </div>
 
-      <div class="map-frame-wrap">
+      <div class="map-frame-wrap" id="mapFrameWrap" style="display:none;">
         <iframe
           id="mapFrame"
           src=""
@@ -519,7 +595,33 @@
           referrerpolicy="no-referrer-when-downgrade">
         </iframe>
       </div>
-      <p class="map-note" id="mapNote">El mapa traza la ruta más cercana disponible para vehículo/caminata; la distancia real del sendero puede diferir del cálculo en línea recta. Street View puede no tener cobertura en zonas rurales.</p>
+      <p class="map-note" id="mapNote" style="display:none;">El mapa traza la ruta más cercana disponible para vehículo/caminata; la distancia real del sendero puede diferir del cálculo en línea recta. Street View puede no tener cobertura en zonas rurales.</p>
+
+      <div class="marketplace-grid is-active" id="marketplaceGrid">
+        <div class="mkt-card">
+          <img src="pollux-gx.jpg" alt="Pollux GX en venta">
+          <div class="mkt-card-body">
+            <div class="mkt-card-title">Pollux GX</div>
+            <div class="mkt-card-sub">Se vende · Trato directo · Entrega inmediata</div>
+            <a href="https://wa.me/51963845681?text=Hola%2C%20vi%20el%20anuncio%20de%20la%20Pollux%20GX%20en%20Trek%20VRAEM%2C%20quisiera%20consultar" target="_blank" rel="noopener" class="mkt-card-cta">Consultar por WhatsApp</a>
+          </div>
+        </div>
+        <div class="mkt-card is-empty">
+          <span class="mkt-empty-icon">＋</span>
+          <div class="mkt-card-sub">Espacio disponible para tu negocio</div>
+          <a href="https://wa.me/51963845681?text=Hola%2C%20quiero%20anunciar%20mi%20negocio%20en%20el%20espacio%20de%20Trek%20VRAEM" target="_blank" rel="noopener" class="mkt-card-cta">Anunciar aquí</a>
+        </div>
+        <div class="mkt-card is-empty">
+          <span class="mkt-empty-icon">＋</span>
+          <div class="mkt-card-sub">Espacio disponible para tu negocio</div>
+          <a href="https://wa.me/51963845681?text=Hola%2C%20quiero%20anunciar%20mi%20negocio%20en%20el%20espacio%20de%20Trek%20VRAEM" target="_blank" rel="noopener" class="mkt-card-cta">Anunciar aquí</a>
+        </div>
+        <div class="mkt-card is-empty">
+          <span class="mkt-empty-icon">＋</span>
+          <div class="mkt-card-sub">Espacio disponible para tu negocio</div>
+          <a href="https://wa.me/51963845681?text=Hola%2C%20quiero%20anunciar%20mi%20negocio%20en%20el%20espacio%20de%20Trek%20VRAEM" target="_blank" rel="noopener" class="mkt-card-cta">Anunciar aquí</a>
+        </div>
+      </div>
     </div>
 
     <div class="stat-row">
@@ -554,6 +656,41 @@
     </div>
     <p class="radio-hint" id="radioHint">Toca RPP para escucharla al toque, o el globo para explorar emisoras del mundo girándolo. Los botones "+" son espacios libres para tus propias emisoras.</p>
     <audio id="radioAudio" style="display:none"></audio>
+  </div>
+</section>
+
+<section class="negocios">
+  <div class="wrap">
+    <h2>Negocios con ESSTRADA Co.</h2>
+    <p class="lead">Anuncia tu negocio de Pichari en este espacio — hoteles, restaurantes, tiendas, lo que sea. Coordinamos por WhatsApp.</p>
+    <div class="negocios-box">
+      <a href="https://wa.me/51963845681?text=Hola%2C%20quiero%20informaci%C3%B3n%20para%20anunciar%20mi%20negocio%20en%20Trek%20VRAEM" target="_blank" rel="noopener" class="wa-btn">Coordinar por WhatsApp →</a>
+      <div class="pago-methods">
+        <div class="pago-method"><strong>Yape / Plin:</strong> al mismo QR de Ligo que te compartimos por WhatsApp al coordinar</div>
+        <div class="pago-method"><strong>PayPal:</strong> <span class="mono-value">paypal.me/greenland2021</span></div>
+        <div class="pago-method"><strong>Bitcoin:</strong> <span class="mono-value">1JRLExYXKbRbE36vDfAdzvRj2LKSLvQU4C</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="dengue">
+  <div class="wrap">
+    <div class="dengue-box">
+      <div class="dengue-icon">🦟</div>
+      <div>
+        <h2>Cuídate del dengue</h2>
+        <p style="color:var(--text-dim);font-size:0.9rem;">El mosquito Aedes aegypti transmite el dengue y se reproduce en agua estancada — algo común en el clima del VRAEM. Unos hábitos simples reducen bastante el riesgo:</p>
+        <ul>
+          <li>Elimina agua estancada en baldes, llantas, macetas o recipientes destapados</li>
+          <li>Tapa los tanques y depósitos de agua de la casa</li>
+          <li>Usa repelente, sobre todo al amanecer y al atardecer</li>
+          <li>Duerme con mosquitero si hay casos de dengue en tu zona</li>
+          <li>Si tienes fiebre alta, dolor de cuerpo o de cabeza intenso, acude a un centro de salud — no te automediques con aspirina</li>
+        </ul>
+        <p class="dengue-note">Información educativa general. Ante síntomas de dengue, acude a un establecimiento de salud lo antes posible.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -765,9 +902,25 @@ function setMapLayer(layer, btnEl){
   document.querySelectorAll('.map-tab').forEach(b => b.classList.remove('active'));
   btnEl.classList.add('active');
   document.getElementById('mapFrame').src = buildMapUrl(layer);
+  document.getElementById('mapFrameWrap').style.display = '';
+  document.getElementById('mapNote').style.display = '';
+  document.getElementById('marketplaceGrid').classList.remove('is-active');
+  document.getElementById('fullscreenBtn').style.display = '';
+  document.getElementById('mapBoxTitle').textContent = 'Distancia del punto de partida al destino';
   document.getElementById('mapNote').textContent = layer === 'street'
     ? 'Street View centrado en Pichari centro (referencial) — la cobertura puede ser limitada o inexistente en zonas rurales del VRAEM.'
     : 'El mapa traza la ruta más cercana disponible para vehículo/caminata; la distancia real del sendero puede diferir del cálculo en línea recta.';
+}
+
+function showMarketplace(btnEl){
+  document.querySelectorAll('.map-tab').forEach(b => b.classList.remove('active'));
+  btnEl.classList.add('active');
+  document.getElementById('mapFrameWrap').style.display = 'none';
+  document.getElementById('mapNote').style.display = 'none';
+  document.getElementById('fullscreenBtn').style.display = 'none';
+  document.getElementById('marketplaceGrid').classList.add('is-active');
+  document.getElementById('mapBoxTitle').textContent = 'Anuncios de negocios en Pichari';
+  document.getElementById('distText').textContent = 'Coordina por WhatsApp';
 }
 
 function toggleMapFullscreen(){
@@ -780,8 +933,8 @@ function toggleMapFullscreen(){
 }
 
 function setupMap(){
-  document.getElementById('distText').textContent = 'Ruta trazada en el mapa (auto/caminata)';
-  document.getElementById('mapFrame').src = buildMapUrl('map');
+  // El mapa ya no se carga de arranque: el marketplace (Negocios) es la vista por defecto.
+  // El src del iframe se asigna recién cuando la persona toca la pestaña "Mapa".
 }
 setupMap();
 
