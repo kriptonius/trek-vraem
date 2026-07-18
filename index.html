@@ -1465,6 +1465,11 @@ let voiceReplyEnabled = true;
 let isListening = false;
 let recognition = null;
 
+if('speechSynthesis' in window){
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
+}
+
 function toggleVoiceReply(){
   voiceReplyEnabled = !voiceReplyEnabled;
   document.getElementById('mateoMuteBtn').textContent = voiceReplyEnabled ? '🔊' : '🔇';
@@ -1473,16 +1478,39 @@ function toggleVoiceReply(){
   }
 }
 
+function limpiarParaVoz(texto){
+  return texto
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/---/g, '')
+    .replace(/#+\s?/g, '')
+    .replace(/[_~`]/g, '')
+    .replace(/\n+/g, '. ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function pickSpanishVoice(voices){
+  const nombresMasculinosConocidos = ['jorge','diego','carlos','miguel','pablo','male','hombre','es-es-standard-b','es-es-standard-c','es-es-standard-d'];
+  const esVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('es'));
+  const masculina = esVoices.find(v => nombresMasculinosConocidos.some(n => v.name.toLowerCase().includes(n)));
+  return { voice: masculina || esVoices[0] || null, esMasculinaConfirmada: !!masculina };
+}
+
 function speakMateo(text){
   if(!voiceReplyEnabled) return;
   if(!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
+  const textoLimpio = limpiarParaVoz(text);
+  const utter = new SpeechSynthesisUtterance(textoLimpio);
   utter.lang = 'es-PE';
   utter.rate = 1;
   const voices = window.speechSynthesis.getVoices();
-  const esVoice = voices.find(v => v.lang && v.lang.startsWith('es'));
-  if(esVoice) utter.voice = esVoice;
+  const { voice, esMasculinaConfirmada } = pickSpanishVoice(voices);
+  if(voice) utter.voice = voice;
+  // Si no encontramos una voz explícitamente masculina, bajamos un poco el tono
+  // como aproximación (los navegadores no siempre exponen el género de la voz).
+  utter.pitch = esMasculinaConfirmada ? 1 : 0.8;
   window.speechSynthesis.speak(utter);
 }
 
@@ -1531,7 +1559,7 @@ function toggleMic(){
   }
 }
 
-setupSpeechRecognition();
+document.addEventListener('DOMContentLoaded', setupSpeechRecognition);
 
 function toggleMateo(){
   mateoOpen = !mateoOpen;
